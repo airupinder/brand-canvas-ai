@@ -144,3 +144,49 @@ document.getElementById('productForm').addEventListener('submit', async function
     document.getElementById('marketingSlogan').innerText = "Error connecting to API.";
   }
 });
+
+document.getElementById('downloadAllBtn').addEventListener('click', async () => {
+  const zip = new JSZip();
+
+  // Collect all images from logo, product, marketing grids
+  const allImages = [
+    ...document.querySelectorAll('#logoGrid img'),
+    ...document.querySelectorAll('#productGrid img'),
+    ...document.querySelectorAll('#marketingGrid img')
+  ];
+
+  if (allImages.length === 0) {
+    alert("No images to download.");
+    return;
+  }
+
+  // Fetch each image then add to zip
+  const fetchAndAddToZip = async (imgElem, index) => {
+    try {
+      const url = imgElem.src;
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      // Get file extension from URL
+      const extMatch = url.match(/\.(jpg|jpeg|png|gif|webp)(\?|$)/i);
+      const ext = extMatch ? extMatch[1] : 'png';
+
+      // Name files with type and index
+      let prefix = 'image';
+      if (imgElem.closest('#logoGrid')) prefix = 'logo';
+      else if (imgElem.closest('#productGrid')) prefix = 'product';
+      else if (imgElem.closest('#marketingGrid')) prefix = 'marketing';
+
+      zip.file(`${prefix}_${index + 1}.${ext}`, blob);
+    } catch (e) {
+      console.error('Error fetching image for zip:', e);
+    }
+  };
+
+  await Promise.all(allImages.map(fetchAndAddToZip));
+
+  // Generate and save the ZIP
+  zip.generateAsync({ type: 'blob' }).then(content => {
+    saveAs(content, 'brand_canvas_images.zip');
+  });
+});
