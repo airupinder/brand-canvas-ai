@@ -8,29 +8,39 @@ document.getElementById('productForm').addEventListener('submit', async function
     return;
   }
 
-  // Show loading or reset outputs
+  // Reset outputs and show loading
   document.getElementById('brandColor').innerText = "Generating...";
   document.getElementById('colorSwatch').style.backgroundColor = "transparent";
+  document.getElementById('brandFont').innerText = "Generating...";
 
   try {
-    const response = await fetch('/api/generateBrandColor', {
+    // Call Brand Color API
+    const colorResponse = await fetch('/api/generateBrandColor', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ context: input }),
     });
 
-    const data = await response.json();
+    const colorData = await colorResponse.json();
 
-    if (response.ok && data.colorHex) {
-      document.getElementById('brandColor').innerText = data.colorHex;
-      document.getElementById('colorSwatch').style.backgroundColor = data.colorHex;
+    if (colorResponse.ok && colorData.colorHex) {
+      document.getElementById('brandColor').innerText = colorData.colorHex;
+      document.getElementById('colorSwatch').style.backgroundColor = colorData.colorHex;
     } else {
-      document.getElementById('brandColor').innerText = data.error || "Failed to generate color.";
+      document.getElementById('brandColor').innerText = colorData.error || "Failed to generate color.";
       document.getElementById('colorSwatch').style.backgroundColor = "transparent";
     }
-  } catch (err) {
-    document.getElementById('brandColor').innerText = "Error connecting to API.";
-    document.getElementById('colorSwatch').style.backgroundColor = "transparent";
-    console.error(err);
-  }
-});
+
+    // Call Font Style API
+    const fontResponse = await fetch('/api/generateFont', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ context: input }),
+    });
+
+    const fontData = await fontResponse.json();
+
+    if (fontResponse.ok && fontData.font) {
+      document.getElementById('brandFont').innerText = fontData.font;
+    } else {
+      document.getElementById('brandFont').
