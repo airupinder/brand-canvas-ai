@@ -1,5 +1,5 @@
 document.getElementById('productForm').addEventListener('submit', async function(e) {
-  e.preventDefault();  // Prevent default form submission causing page reload
+  e.preventDefault();
 
   const input = document.getElementById('productInput').value.trim();
 
@@ -12,6 +12,8 @@ document.getElementById('productForm').addEventListener('submit', async function
   document.getElementById('brandColor').innerText = "Generating...";
   document.getElementById('colorSwatch').style.backgroundColor = "transparent";
   document.getElementById('brandFont').innerText = "Generating...";
+  const imagesGrid = document.getElementById('imagesGrid');
+  imagesGrid.innerHTML = '';  // Clear previous images
 
   try {
     // Call Brand Color API
@@ -44,6 +46,32 @@ document.getElementById('productForm').addEventListener('submit', async function
       document.getElementById('brandFont').innerText = fontData.font;
     } else {
       document.getElementById('brandFont').innerText = fontData.error || "Failed to generate font.";
+    }
+
+    // Call Logo Generation API
+    const logoResponse = await fetch('/api/generateLogo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ context: input }),
+    });
+
+    const logoData = await logoResponse.json();
+
+    if (logoResponse.ok && logoData.imageUrl) {
+      // Create image wrapper div
+      const wrapper = document.createElement('div');
+      wrapper.className = 'image-wrapper';
+
+      // Create image element
+      const img = document.createElement('img');
+      img.src = logoData.imageUrl;
+      img.alt = 'Generated Logo';
+
+      // Append image and add to grid
+      wrapper.appendChild(img);
+      imagesGrid.appendChild(wrapper);
+    } else {
+      console.error("Logo generation failed:", logoData.error);
     }
   } catch (err) {
     document.getElementById('brandColor').innerText = "Error connecting to API.";
