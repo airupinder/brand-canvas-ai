@@ -12,8 +12,56 @@ document.getElementById('productForm').addEventListener('submit', async function
   document.getElementById('brandColor').innerText = "Generating...";
   document.getElementById('colorSwatch').style.backgroundColor = "transparent";
   document.getElementById('brandFont').innerText = "Generating...";
-  const imagesGrid = document.getElementById('imagesGrid');
-  imagesGrid.innerHTML = '';  // Clear previous images
+  const logoGrid = document.getElementById('logoGrid');
+  const productGrid = document.getElementById('productGrid');
+  const marketingGrid = document.getElementById('marketingGrid');
+  
+  // Clear previous images
+  logoGrid.innerHTML = '';
+  productGrid.innerHTML = '';
+  marketingGrid.innerHTML = '';
+  
+  // After you get logo image URL
+  if (logoResponse.ok && logoData.imageUrl) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'image-wrapper';
+  
+    const img = document.createElement('img');
+    img.src = logoData.imageUrl;
+    img.alt = 'Generated Logo';
+  
+    wrapper.appendChild(img);
+    logoGrid.appendChild(wrapper);
+  }
+  
+  // After you get product images URLs
+  if (productResponse.ok && productData.imageUrls && productData.imageUrls.length > 0) {
+    productData.imageUrls.forEach((url, idx) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'image-wrapper';
+  
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = `Product Image ${idx + 1}`;
+  
+      wrapper.appendChild(img);
+      productGrid.appendChild(wrapper);
+    });
+  }
+  
+  // After you get marketing image URL
+  if (marketingResponse.ok && marketingData.imageUrl) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'image-wrapper';
+  
+    const img = document.createElement('img');
+    img.src = marketingData.imageUrl;
+    img.alt = 'Marketing Image';
+  
+    wrapper.appendChild(img);
+    marketingGrid.appendChild(wrapper);
+  }
+
 
   try {
     // Call Brand Color API
