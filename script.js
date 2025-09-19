@@ -73,6 +73,32 @@ document.getElementById('productForm').addEventListener('submit', async function
     } else {
       console.error("Logo generation failed:", logoData.error);
     }
+
+    // Call Product Images API
+    const productResponse = await fetch('/api/generateProductImages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ context: input }),
+    });
+    
+    const productData = await productResponse.json();
+    
+    if (productResponse.ok && productData.imageUrls && productData.imageUrls.length > 0) {
+      productData.imageUrls.forEach((url, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'image-wrapper';
+    
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = `Product Image ${idx + 1}`;
+    
+        wrapper.appendChild(img);
+        imagesGrid.appendChild(wrapper);
+      });
+    } else {
+      console.error("Product images generation failed:", productData.error);
+    }
+
   } catch (err) {
     document.getElementById('brandColor').innerText = "Error connecting to API.";
     document.getElementById('colorSwatch').style.backgroundColor = "transparent";
