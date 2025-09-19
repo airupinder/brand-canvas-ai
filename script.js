@@ -1,5 +1,5 @@
 document.getElementById('productForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
+  e.preventDefault();  // Prevent default form submission causing page reload
 
   const input = document.getElementById('productInput').value.trim();
 
@@ -43,4 +43,12 @@ document.getElementById('productForm').addEventListener('submit', async function
     if (fontResponse.ok && fontData.font) {
       document.getElementById('brandFont').innerText = fontData.font;
     } else {
-      document.getElementById('brandFont').
+      document.getElementById('brandFont').innerText = fontData.error || "Failed to generate font.";
+    }
+  } catch (err) {
+    document.getElementById('brandColor').innerText = "Error connecting to API.";
+    document.getElementById('colorSwatch').style.backgroundColor = "transparent";
+    document.getElementById('brandFont').innerText = "Error connecting to API.";
+    console.error(err);
+  }
+});
