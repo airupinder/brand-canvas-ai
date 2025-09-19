@@ -12,56 +12,16 @@ document.getElementById('productForm').addEventListener('submit', async function
   document.getElementById('brandColor').innerText = "Generating...";
   document.getElementById('colorSwatch').style.backgroundColor = "transparent";
   document.getElementById('brandFont').innerText = "Generating...";
+
+  // Reference separate image containers
   const logoGrid = document.getElementById('logoGrid');
   const productGrid = document.getElementById('productGrid');
   const marketingGrid = document.getElementById('marketingGrid');
-  
+
   // Clear previous images
   logoGrid.innerHTML = '';
   productGrid.innerHTML = '';
   marketingGrid.innerHTML = '';
-  
-  // After you get logo image URL
-  if (logoResponse.ok && logoData.imageUrl) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'image-wrapper';
-  
-    const img = document.createElement('img');
-    img.src = logoData.imageUrl;
-    img.alt = 'Generated Logo';
-  
-    wrapper.appendChild(img);
-    logoGrid.appendChild(wrapper);
-  }
-  
-  // After you get product images URLs
-  if (productResponse.ok && productData.imageUrls && productData.imageUrls.length > 0) {
-    productData.imageUrls.forEach((url, idx) => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'image-wrapper';
-  
-      const img = document.createElement('img');
-      img.src = url;
-      img.alt = `Product Image ${idx + 1}`;
-  
-      wrapper.appendChild(img);
-      productGrid.appendChild(wrapper);
-    });
-  }
-  
-  // After you get marketing image URL
-  if (marketingResponse.ok && marketingData.imageUrl) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'image-wrapper';
-  
-    const img = document.createElement('img');
-    img.src = marketingData.imageUrl;
-    img.alt = 'Marketing Image';
-  
-    wrapper.appendChild(img);
-    marketingGrid.appendChild(wrapper);
-  }
-
 
   try {
     // Call Brand Color API
@@ -106,18 +66,15 @@ document.getElementById('productForm').addEventListener('submit', async function
     const logoData = await logoResponse.json();
 
     if (logoResponse.ok && logoData.imageUrl) {
-      // Create image wrapper div
       const wrapper = document.createElement('div');
       wrapper.className = 'image-wrapper';
 
-      // Create image element
       const img = document.createElement('img');
       img.src = logoData.imageUrl;
       img.alt = 'Generated Logo';
 
-      // Append image and add to grid
       wrapper.appendChild(img);
-      imagesGrid.appendChild(wrapper);
+      logoGrid.appendChild(wrapper);
     } else {
       console.error("Logo generation failed:", logoData.error);
     }
@@ -128,48 +85,47 @@ document.getElementById('productForm').addEventListener('submit', async function
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ context: input }),
     });
-    
+
     const productData = await productResponse.json();
-    
+
     if (productResponse.ok && productData.imageUrls && productData.imageUrls.length > 0) {
       productData.imageUrls.forEach((url, idx) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'image-wrapper';
-    
+
         const img = document.createElement('img');
         img.src = url;
         img.alt = `Product Image ${idx + 1}`;
-    
+
         wrapper.appendChild(img);
-        imagesGrid.appendChild(wrapper);
+        productGrid.appendChild(wrapper);
       });
     } else {
       console.error("Product images generation failed:", productData.error);
     }
+
     // Call Marketing Image API
     const marketingResponse = await fetch('/api/generateMarketingImage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ context: input }),
     });
-    
+
     const marketingData = await marketingResponse.json();
-    
+
     if (marketingResponse.ok && marketingData.imageUrl) {
       const wrapper = document.createElement('div');
       wrapper.className = 'image-wrapper';
-    
+
       const img = document.createElement('img');
       img.src = marketingData.imageUrl;
       img.alt = 'Marketing Image';
-    
+
       wrapper.appendChild(img);
-      imagesGrid.appendChild(wrapper);
+      marketingGrid.appendChild(wrapper);
     } else {
       console.error("Marketing image generation failed:", marketingData.error);
     }
-
-
   } catch (err) {
     document.getElementById('brandColor').innerText = "Error connecting to API.";
     document.getElementById('colorSwatch').style.backgroundColor = "transparent";
