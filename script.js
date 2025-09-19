@@ -98,6 +98,29 @@ document.getElementById('productForm').addEventListener('submit', async function
     } else {
       console.error("Product images generation failed:", productData.error);
     }
+    // Call Marketing Image API
+    const marketingResponse = await fetch('/api/generateMarketingImage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ context: input }),
+    });
+    
+    const marketingData = await marketingResponse.json();
+    
+    if (marketingResponse.ok && marketingData.imageUrl) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'image-wrapper';
+    
+      const img = document.createElement('img');
+      img.src = marketingData.imageUrl;
+      img.alt = 'Marketing Image';
+    
+      wrapper.appendChild(img);
+      imagesGrid.appendChild(wrapper);
+    } else {
+      console.error("Marketing image generation failed:", marketingData.error);
+    }
+
 
   } catch (err) {
     document.getElementById('brandColor').innerText = "Error connecting to API.";
